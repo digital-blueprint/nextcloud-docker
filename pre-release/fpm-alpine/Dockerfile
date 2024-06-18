@@ -1,5 +1,5 @@
 # DO NOT EDIT: created by update.sh from Dockerfile-alpine.template
-FROM php:8.2-fpm-alpine3.18
+FROM php:8.2-fpm-alpine3.20
 
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
@@ -36,11 +36,13 @@ RUN set -ex; \
         postgresql-dev \
     ; \
     \
+    docker-php-ext-configure ftp --with-openssl-dir=/usr; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
     docker-php-ext-configure ldap; \
     docker-php-ext-install -j "$(nproc)" \
         bcmath \
         exif \
+        ftp \
         gd \
         gmp \
         intl \
@@ -54,10 +56,10 @@ RUN set -ex; \
     ; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
-    pecl install APCu-5.1.22; \
+    pecl install APCu-5.1.23; \
     pecl install imagick-3.7.0; \
     pecl install memcached-3.2.0; \
-    pecl install redis-5.3.7; \
+    pecl install redis-6.0.2; \
     \
     docker-php-ext-enable \
         apcu \
@@ -100,13 +102,18 @@ RUN { \
     } > "${PHP_INI_DIR}/conf.d/nextcloud.ini"; \
     \
     mkdir /var/www/data; \
+    mkdir -p /docker-entrypoint-hooks.d/pre-installation \
+             /docker-entrypoint-hooks.d/post-installation \
+             /docker-entrypoint-hooks.d/pre-upgrade \
+             /docker-entrypoint-hooks.d/post-upgrade \
+             /docker-entrypoint-hooks.d/before-starting; \
     chown -R www-data:root /var/www; \
     chmod -R g=u /var/www
 
 VOLUME /var/www/html
 
 
-ENV NEXTCLOUD_VERSION 29.0.0rc1
+ENV NEXTCLOUD_VERSION 29.0.2
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \
@@ -114,8 +121,8 @@ RUN set -ex; \
         gnupg \
     ; \
     \
-    curl -fsSL -o nextcloud.tar.bz2 "https://download.nextcloud.com/server/prereleases/nextcloud-29.0.0rc1.tar.bz2"; \
-    curl -fsSL -o nextcloud.tar.bz2.asc "https://download.nextcloud.com/server/prereleases/nextcloud-29.0.0rc1.tar.bz2.asc"; \
+    curl -fsSL -o nextcloud.tar.bz2 "https://download.nextcloud.com/server/releases/nextcloud-29.0.2.tar.bz2"; \
+    curl -fsSL -o nextcloud.tar.bz2.asc "https://download.nextcloud.com/server/releases/nextcloud-29.0.2.tar.bz2.asc"; \
     export GNUPGHOME="$(mktemp -d)"; \
 # gpg key from https://nextcloud.com/nextcloud.asc
     gpg --batch --keyserver keyserver.ubuntu.com  --recv-keys 28806A878AE423A28372792ED75899B9A724937A; \
