@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: pre-release/apache
+      dockerfile: Dockerfile
+    image: nextcloud-pre:33.0.0rc2
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud
+      # Optional tuning overrides:
+      # PHP_MEMORY_LIMIT: 512M
+      # PHP_UPLOAD_LIMIT: 512M
+      # APACHE_BODY_LIMIT: 1073741824
+    volumes:
+      - nextcloud-html:/var/www/html
+
+volumes:
+  nextcloud-html:
+  # redis-data:
