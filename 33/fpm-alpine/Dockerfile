@@ -1,5 +1,5 @@
 # DO NOT EDIT: created by update.sh from Dockerfile-alpine.template
-FROM php:8.4-fpm-alpine3.23
+FROM php:8.4-fpm-alpine3.24
 
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
@@ -62,7 +62,7 @@ RUN set -ex; \
     \
 # pecl will claim success even if one install fails, so we need to perform each install separately
     pecl install APCu-5.1.28; \
-    pecl install igbinary-3.2.16; \
+    pecl install igbinary-3.2.17RC1; \
     pecl install imagick-3.8.1; \
     pecl install --configureoptions 'enable-memcached-igbinary="yes"' \
         memcached-3.4.0; \
@@ -128,7 +128,7 @@ RUN { \
 VOLUME /var/www/html
 
 
-ENV NEXTCLOUD_VERSION 33.0.3
+ENV NEXTCLOUD_VERSION 33.0.8
 
 RUN set -ex; \
     apk add --no-cache --virtual .fetch-deps \
@@ -136,8 +136,8 @@ RUN set -ex; \
         gnupg \
     ; \
     \
-    curl -fsSL -o nextcloud.tar.bz2 "https://github.com/nextcloud-releases/server/releases/download/v33.0.3/nextcloud-33.0.3.tar.bz2"; \
-    curl -fsSL -o nextcloud.tar.bz2.asc "https://github.com/nextcloud-releases/server/releases/download/v33.0.3/nextcloud-33.0.3.tar.bz2.asc"; \
+    curl -fsSL -o nextcloud.tar.bz2 "https://github.com/nextcloud-releases/server/releases/download/v33.0.8/nextcloud-33.0.8.tar.bz2"; \
+    curl -fsSL -o nextcloud.tar.bz2.asc "https://github.com/nextcloud-releases/server/releases/download/v33.0.8/nextcloud-33.0.8.tar.bz2.asc"; \
     export GNUPGHOME="$(mktemp -d)"; \
 # gpg key from https://nextcloud.com/nextcloud.asc
     gpg --batch --keyserver keyserver.ubuntu.com  --recv-keys 28806A878AE423A28372792ED75899B9A724937A; \
